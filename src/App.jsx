@@ -1,33 +1,48 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+ 
+import ImcCalc from './components/ImcCalc.jsx';
+import ImcTable from './components/ImcTable.jsx';
+import { data } from './data/data.js';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const calcImc = (e, height, weight) => {
+    e.preventDefault();
+
+    if(!height||!weight) return console.log('Falha');
+    
+    const heightFloat = +height.replace(",",".");
+    const weightFloat = +weight.replace(",",".");
+
+    const imcResult = (weightFloat / (heightFloat * heightFloat)).toFixed(2)
+
+    data.forEach((item) => {
+      if(imcResult >= item.min && imcResult <= item.max){
+        setInfo(item.info);
+        setInfoClass(item.infoClass);
+      }
+    })
+    setImc(imcResult)
+  }
+ 
+  const resetCalc = (e) => {
+    setImc("")
+  }
+
+  const [imc, setImc] = useState("");
+  const [info, setInfo] = useState("");
+  const [infoClass, setInfoClass] = useState("");
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <>  
+      <div className="container">
+        {!imc ? (
+         <ImcCalc calcImc={calcImc}/> 
+        ):(
+          <ImcTable data={data} imc={imc} info={info} infoClass={infoClass} resetCalc={resetCalc}/> 
+        )}
+        
+      </div> 
     </>
   )
 }
